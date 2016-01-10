@@ -1,0 +1,8 @@
+0. About
+
+Zadanie z etapu P3 zaliczania pracowni z Systemów operacyjnych.
+
+Implementacja alokatora pamięci na wzór wywołań malloc/free z biblioteki
+standardowej C.
+
+Wykonane przez Mateusza Sznura (msznura@gmail.com).
