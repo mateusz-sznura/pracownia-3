@@ -1,6 +1,6 @@
 all: libmy_malloc.so test 
 	
-libmy_malloc.so : my_malloc.c my_malloc.h
+libmy_malloc.so : my_malloc.c my_malloc.h my_malloc_private.h
 	gcc -c -fPIC my_malloc.c -o my_malloc.o
 	gcc my_malloc.o -shared -o libmy_malloc.so
 	rm my_malloc.o
