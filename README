@@ -6,3 +6,20 @@ Implementacja alokatora pamięci na wzór wywołań malloc/free z biblioteki
 standardowej C.
 
 Wykonane przez Mateusza Sznura (msznura@gmail.com).
+
+
+1. Building
+
+To build the program, execute:
+
+make
+
+
+2. Running 
+
+To run the program, execute:
+
+make run
+
+One silly thing about my program: if you want to see different demo cases,
+you need to edit test.c, uncomment required call, rebuild and rerun.
