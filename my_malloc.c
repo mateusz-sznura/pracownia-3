@@ -1,11 +1,13 @@
-// Issues:
-// merging adjacent free blocks,
+// Issues (TO DO):
+// better realloc with regard to now available block merging/dividing functions,
 // thread safety, 
 // portability of data allignment (generalize the word size),
 // overflow test in my_calloc,
 // other strategy than first fit might be better,
-// return memory back to the system,
+// return free end memory region back to the system,
 // why newly allocated memory is zeroed?
+// smaller block_info_t in order to save some space (24-byte is possible?),
+// copy block in 8B chunks instead of using memset
 
 #include <stdio.h>
 #include <stdlib.h>  // size_t declared here
@@ -113,6 +115,10 @@ void *my_realloc(void *ptr, size_t size)
   {
     return my_malloc(size);
   }
+  if(!is_valid_pointer(ptr))
+  {
+    return NULL;
+  }
   block_info_t block = (block_info_t)ptr - 1;
   if( block->size >= size)
   {
@@ -124,7 +130,7 @@ void *my_realloc(void *ptr, size_t size)
     if(new_ptr) 
     {
       memcpy(new_ptr, ptr, block->size);
-      block->is_free = 1;
+      my_free((void *)(block+1));
     }
     return new_ptr;
   }
@@ -193,7 +199,7 @@ void print_block_list()
 {
   printf("## First block: %d\n", first_block);
   block_info_t current = first_block;
-  while( current )
+  while(current)
   {
     printf("## A: %d, S: %d, F: %d, N: %d, P: %d\n", 
         current,
