@@ -1,6 +1,7 @@
 // Issues: merging adjacent free blocks,
 // thread safety, 
-// overflow test in my_calloc, checking for valid pointer in my_free,
+// portability of data allignment: generalize the word size,
+// overflow test in my_calloc,
 // other strategy than first fit
 
 #include <stdio.h>
@@ -56,6 +57,7 @@ block_info_t request_new_block(size_t size)
   {
     new_block->size = size;
     new_block->is_free = 0;
+    new_block->ptr = (void *)(new_block + 1);
     new_block->next = NULL;
     new_block->prev = last_block;
     if( last_block )
@@ -80,6 +82,7 @@ void divide_block(block_info_t block, size_t size)
   block_info_t new_block = (block_info_t)((char *)block + size + BLOCK_INFO_SIZE);
   new_block->size = block->size - size - BLOCK_INFO_SIZE;
   new_block->is_free = 1;
+  new_block->ptr = (void *)(new_block + 1);
   new_block->next = block->next;
   new_block->prev = block;
   block->size = size;
@@ -96,14 +99,14 @@ void *my_calloc(size_t count, size_t size)
   void *ptr = my_malloc(count * size);
   if(ptr)
   {
-    memset(ptr, 0, count * size);
+    memset(ptr, 0, allign(count * size));
   }
   return ptr; 
 }
 
 void *my_realloc(void *ptr, size_t size)
 {
-  if( !ptr )
+  if(!ptr)
   {
     return my_malloc(size);
   }
@@ -126,18 +129,29 @@ void *my_realloc(void *ptr, size_t size)
 
 void my_free(void *ptr)
 {
-  if(ptr)
+  if(is_valid_pointer(ptr))
   {
-    // TO DO: Check if ptr is valid pointer to beginning of occupied block
-    // TO DO: Merge adjacent free blocks
     block_info_t block = (block_info_t)ptr - 1;
     block->is_free = 1;
   }
 }
 
+int is_valid_pointer(void *ptr)
+{
+  if(!ptr)
+  {
+    return 0;
+  }
+  if(first_block && ptr >= (void *)first_block + 1 && ptr < sbrk(0) )
+  {
+    block_info_t block = (block_info_t)ptr - 1;
+    return ptr == block->ptr;
+  }
+  return 0;
+}
+
 size_t allign(size_t n)
 {
-  // TO DO: Make it work for different word sizes
   if( n > 0 )
   {
     return ((n - 1 >> 3) << 3) + 8;

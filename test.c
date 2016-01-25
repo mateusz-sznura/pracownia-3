@@ -78,10 +78,10 @@ void test_6()
   printf("-------- Test 6\n");
   printf("-------- Demonstrate block splitting (+ exhausting allocated space)\n");
   
-  int *array = (int *)my_malloc(20 * sizeof(int));
+  int *array = (int *)my_malloc(24 * sizeof(int));
   int *after = (int *)my_malloc(sizeof(int));
   *after = 100;
-  for(int i = 0; i < 20; ++i)
+  for(int i = 0; i < 24; ++i)
   {
     array[i] = i;
   }
