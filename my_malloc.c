@@ -130,7 +130,7 @@ void *my_realloc(void *ptr, size_t size)
     if(new_ptr) 
     {
       memcpy(new_ptr, ptr, block->size);
-      my_free((void *)(block+1));
+      my_free(ptr);
     }
     return new_ptr;
   }
