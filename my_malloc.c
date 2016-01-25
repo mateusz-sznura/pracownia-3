@@ -1,8 +1,9 @@
-// Issues: merging adjacent free blocks,
+// Issues:
+// merging adjacent free blocks,
 // thread safety, 
-// portability of data allignment: generalize the word size,
+// portability of data allignment (generalize the word size),
 // overflow test in my_calloc,
-// other strategy than first fit
+// other strategy than first fit might be better.
 
 #include <stdio.h>
 #include <stdlib.h>  // size_t declared here
@@ -142,7 +143,7 @@ int is_valid_pointer(void *ptr)
   {
     return 0;
   }
-  if(first_block && ptr >= (void *)first_block + 1 && ptr < sbrk(0) )
+  if(first_block && ptr >= (void *)first_block + 1 && ptr < sbrk(0))
   {
     block_info_t block = (block_info_t)ptr - 1;
     return ptr == block->ptr;
@@ -152,7 +153,7 @@ int is_valid_pointer(void *ptr)
 
 size_t allign(size_t n)
 {
-  if( n > 0 )
+  if(n > 0)
   {
     return ((n - 1 >> 3) << 3) + 8;
   }
