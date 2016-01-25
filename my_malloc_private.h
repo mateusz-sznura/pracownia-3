@@ -16,6 +16,7 @@ block_info_t find_reusable_block(size_t size);
 block_info_t request_new_block(size_t size);
 
 void divide_block(block_info_t block, size_t size);
+block_info_t merge_block(block_info_t block);
 
 int is_valid_pointer(void *ptr);
 

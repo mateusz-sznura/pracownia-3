@@ -3,7 +3,9 @@
 // thread safety, 
 // portability of data allignment (generalize the word size),
 // overflow test in my_calloc,
-// other strategy than first fit might be better.
+// other strategy than first fit might be better,
+// return memory back to the system,
+// why newly allocated memory is zeroed?
 
 #include <stdio.h>
 #include <stdlib.h>  // size_t declared here
@@ -134,6 +136,14 @@ void my_free(void *ptr)
   {
     block_info_t block = (block_info_t)ptr - 1;
     block->is_free = 1;
+    if(block->prev && block->prev->is_free)
+    {
+      block = merge_block(block->prev);
+    }
+    if(block->next && block->next->is_free)
+    {
+      merge_block(block);
+    }
   }
 }
 
@@ -149,6 +159,18 @@ int is_valid_pointer(void *ptr)
     return ptr == block->ptr;
   }
   return 0;
+}
+
+block_info_t merge_block(block_info_t block)
+{
+  block_info_t next = block->next;
+  block->size += BLOCK_INFO_SIZE + next->size;
+  block->next = next->next;
+  if(next->next)
+  {
+    next->next->prev = block;
+  }
+  return block;
 }
 
 size_t allign(size_t n)
