@@ -1,13 +1,15 @@
-// Issues (TO DO):
-// better realloc with regard to now available block merging/dividing functions,
-// thread safety, 
-// portability of data allignment (generalize the word size),
-// overflow test in my_calloc,
-// other strategy than first fit might be better,
-// return free end memory region back to the system,
-// why newly allocated memory is zeroed?
-// smaller block_info_t in order to save some space (24-byte is possible?),
-// copy block in 8B chunks instead of using memset
+// HIGH PRIO TO DO:
+// - smarter and more effiecient my_realloc (block merging/dividing should be employed),
+// - thread safety, 
+// - return free memory from end region back to the system,
+// - portability of data allignment (generalize the word size, sbrk is used portably already),
+//
+// LOW PRIO TO DO:
+// - overflow test in my_calloc,
+// - other strategy than first fit might be better,
+// - why is newly allocated memory zeroed from the very beginning? (OS does that?),
+// - smaller block_info_t in order to save some space (24-byte is possible?),
+// - instead of using memcpy/memset, copy/clear in chunks of 8B chunks in my_calloc/my_realloc.
 
 #include <stdio.h>
 #include <stdlib.h>  // size_t declared here
@@ -27,7 +29,7 @@ void *my_malloc(size_t size)
   if(block) 
   {
     block->is_free = 0;
-    if( block->size >= size + BLOCK_INFO_SIZE + 8 )
+    if(block->size >= size + BLOCK_INFO_SIZE + 8)
     {
       divide_block(block, size);
     }
@@ -44,7 +46,7 @@ void *my_malloc(size_t size)
 block_info_t find_reusable_block(size_t size) 
 {
   block_info_t current = first_block;
-  while( current && (!current->is_free || current->size < size) )
+  while(current && (!current->is_free || current->size < size))
   {
     current = current->next;
   }
@@ -54,7 +56,7 @@ block_info_t find_reusable_block(size_t size)
 block_info_t request_new_block(size_t size)
 {
   block_info_t new_block = sbrk(0);
-  if( sbrk(size + BLOCK_INFO_SIZE) == (void *)-1 )
+  if(sbrk(size + BLOCK_INFO_SIZE) == (void *)-1)
   {
     return NULL;
   }
