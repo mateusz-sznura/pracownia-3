@@ -32,7 +32,6 @@ void *my_malloc(size_t size)
 
 block_info_t find_reusable_block(size_t size) 
 {
-  // first-fit strategy
   block_info_t current = first_block;
   while( current && (!current->is_free || current->size < size) )
   {
@@ -43,10 +42,8 @@ block_info_t find_reusable_block(size_t size)
 
 block_info_t request_new_block(size_t size)
 {
-  // TO DO: Align block size to 8 octets
-  // Not thread safe!
   block_info_t new_block = sbrk(0);
-  if( sbrk(size + BLOCK_INFO_SIZE) == (void *)-1 )
+  if( sbrk(allign(size) + BLOCK_INFO_SIZE) == (void *)-1 )
   {
     return NULL;
   }
@@ -66,6 +63,26 @@ block_info_t request_new_block(size_t size)
       first_block = new_block;
     }
     return new_block;
+  }
+}
+
+void divide_block(block_info_t block, size_t size)
+{
+  if( !block )
+  {
+    return;
+  }
+  block_info_t new_block = (block_info_t)((char *)block + size + BLOCK_INFO_SIZE);
+  new_block->size = block->size - size - BLOCK_INFO_SIZE;
+  new_block->is_free = 1;
+  new_block->next = block->next;
+  new_block->prev = block;
+  block->size = size;
+  block->next = new_block;
+  new_block->next->prev = new_block;
+  if( last_block == block )
+  {
+    last_block = new_block;
   }
 }
 
@@ -110,5 +127,18 @@ void my_free(void *ptr)
     // TO DO: Merge adjacent free blocks
     block_info_t block = (block_info_t)ptr - 1;
     block->is_free = 1;
+  }
+}
+
+size_t allign(size_t n)
+{
+  // TO DO: Make it work for different word sizes
+  if( n > 0 )
+  {
+    return ((n - 1 >> 3) << 3) + 8;
+  }
+  else
+  {
+    return 0;
   }
 }

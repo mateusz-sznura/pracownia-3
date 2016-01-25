@@ -4,6 +4,7 @@
 typedef struct block_info_t {
   size_t size;
   int is_free;
+  char _padding[4];
   struct block_info_t *next;
   struct block_info_t *prev;
 } *block_info_t;
@@ -12,5 +13,9 @@ typedef struct block_info_t {
 
 block_info_t find_reusable_block(size_t size);
 block_info_t request_new_block(size_t size);
+
+void divide_block(block_info_t block, size_t size);
+
+size_t allign(size_t n);
 
 #endif
