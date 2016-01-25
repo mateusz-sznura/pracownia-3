@@ -23,3 +23,6 @@ make run
 
 One silly thing about my program: if you want to see different demo cases,
 you need to edit test.c, uncomment required call, rebuild and rerun.
+
+Demo cases 6 and 7 (presenting dividing and merging of blocks) are by far
+the most interesting, the rest is rather simple and dull.
