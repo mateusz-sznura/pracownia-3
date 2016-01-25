@@ -170,6 +170,10 @@ block_info_t merge_block(block_info_t block)
   {
     next->next->prev = block;
   }
+  if(last_block == next)
+  {
+    last_block = block;
+  }
   return block;
 }
 

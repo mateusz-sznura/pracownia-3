@@ -1,24 +1,25 @@
-#include <stdio.h>  // printf declared here
+#include <stdio.h> 
 #include <string.h>  // strcpy declared here
-#include <stdlib.h>  // malloc
+#include <stdlib.h>  // malloc declared here
 
 #include "my_malloc.h"
 #include "my_malloc_private.h"
 
-void print_sizes()
+void demo_0()
 {
-  printf("-------- Sizes of types\n");
-  printf("sizeof(int): %d\n", sizeof(int));
-  printf("sizeof(long): %d\n", sizeof(long));
-  printf("sizeof(void*): %d\n", sizeof(void*));
-  printf("sizeof(size_t): %d\n", sizeof(size_t));
-  printf("sizeof(struct block_info_t): %d\n", sizeof(struct block_info_t));
+  printf("-------- Demo 0\n");
+  printf("-------- Type sizes\n");
+  printf("%20s : %d\n", "int", sizeof(int));
+  printf("%20s : %d\n", "long", sizeof(long));
+  printf("%20s : %d\n", "void*", sizeof(void*));
+  printf("%20s : %d\n", "size_t", sizeof(size_t));
+  printf("%20s : %d\n", "struct block_info_t", sizeof(struct block_info_t));
 }
 
-void test_case_1()
+void demo_1()
 {
-  // Alloc, free, alloc again - check if allocated the same space
-  printf("-------- Test case 1\n");
+  printf("-------- Demo 1\n");
+  printf("Alloc, free, alloc again - check if allocated the same space\n");
   int *ptr = (int *)my_malloc(sizeof(int));
   printf("Address: %d, value (before assignment): %d\n", ptr, *ptr);
   *ptr = 100;
@@ -29,10 +30,10 @@ void test_case_1()
   printf("Address: %d, value: %d\n", ptr_2, *ptr_2);
 }
 
-void test_case_2()
+void demo_2()
 {
-  // Multiple allocs - check if allocated different space
-  printf("-------- Test case 2\n");
+  printf("-------- Demo 2\n");
+  printf("-------- Multiple allocs - check if allocated different space\n");
   int *ptr_1 = (int *)my_malloc(sizeof(int));
   int *ptr_2 = (int *)my_malloc(sizeof(int));
   int *ptr_3 = (int *)my_malloc(sizeof(int));
@@ -44,28 +45,28 @@ void test_case_2()
   printf("Address: %d, value: %d\n", ptr_3, *ptr_3);
 }
 
-void test_case_3()
+void demo_3()
 {
-  // Allocate memory for string
-  printf("-------- Test case 3\n");
+  printf("-------- Demo 3\n");
+  printf("-------- Allocate memory for string\n");
   char *str = my_malloc(12 * sizeof(char));
   strcpy(str, "Ala ma kota");
   printf("Address: %d, string (allocated 12 bytes): %s\n", str, str);
 }
 
-void test_case_4()
+void demo_4()
 {
-  // Test calloc
-  printf("-------- Test case 4\n");
+  printf("-------- Demo 4\n");
+  printf("-------- Demo calloc\n");
   int *ptr_1 = my_calloc(1, sizeof(int));
   int *ptr_2 = my_malloc(sizeof(int));
   printf("Address: %d, value (calloc): %d\n", ptr_1, *ptr_1);
   printf("Address: %d, value (malloc): %d\n", ptr_2, *ptr_2);
 }
 
-void test_case_5()
+void demo_5()
 {
-  printf("-------- Test case 5\n");
+  printf("-------- Demo 5\n");
   printf("-------- Data allignment\n");
   char *ptr_1 = my_malloc(11);
   int *ptr_2 = my_malloc(sizeof(int));
@@ -73,9 +74,9 @@ void test_case_5()
   printf("Address: %d (int)\n", ptr_2);
 }
 
-void test_6()
+void demo_6()
 {
-  printf("-------- Test 6\n");
+  printf("-------- Demo 6\n");
   printf("-------- Demonstrate block splitting (+ exhausting allocated space)\n");
   
   int *array = (int *)my_malloc(24 * sizeof(int));
@@ -88,7 +89,8 @@ void test_6()
   printf("Address: %d, value: %d (array[0])\n", array, array[0]);
   printf("Address: %d, value: %d (after)\n", after, *after);
 
-  printf("Exhausting allocated space does not overwrite next block? %d\n", ((block_info_t)after - 1)->size == sizeof(size_t));  
+  printf("Exhausting allocated space does not overwrite next block? %d\n", 
+      ((block_info_t)after - 1)->size == sizeof(size_t));  
 
   my_free(array);
 
@@ -102,16 +104,38 @@ void test_6()
   print_block_list();
 }
 
+void demo_7()
+{
+  printf("-------- Demo 7\n");
+  printf("-------- Demonstrate block merging\n");
+  int *ptr_1 = (int *)my_malloc(sizeof(int));
+  int *ptr_2 = (int *)my_malloc(sizeof(int));
+  int *ptr_3 = (int *)my_malloc(sizeof(int));
+  int *ptr_4 = (int *)my_malloc(sizeof(int));
+ 
+  my_free(ptr_1);
+  my_free(ptr_3);
+  printf("After freeing ptr_1 and ptr_3\n");
+  print_block_list();
+
+  my_free(ptr_4);
+  printf("After freeing ptr_4\n");
+  print_block_list();
+
+  my_free(ptr_2);
+  printf("After freeing ptr_2\n");
+  print_block_list();
+}
+
 int main(int argc, char** argv)
 {
-  // int *p = malloc(0);
-  // printf("%d, %d\n", p, *p);
-  // print_sizes();
-  // test_case_1();
-  // test_case_2();
-  // test_case_3();
-  // test_case_4();
-  // test_case_5();
-  test_6();
+  demo_0();
+  // demo_1();
+  // demo_2();
+  // demo_3();
+  // demo_4();
+  // demo_5();
+  // demo_6();
+  demo_7();
   return 0;
 }
