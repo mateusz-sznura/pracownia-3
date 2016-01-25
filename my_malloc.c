@@ -1,8 +1,9 @@
-// Issues: splitting blocks, merging adjacent free blocks,
-// thread safety, aligning, reusing redundant blocks from struct,
+// Issues: merging adjacent free blocks,
+// thread safety, 
 // overflow test in my_calloc, checking for valid pointer in my_free,
 // other strategy than first fit
 
+#include <stdio.h>
 #include <stdlib.h>  // size_t declared here
 #include <unistd.h>  // sbrk declared here 
 #include <string.h>  // memcpy, memset declared here
@@ -15,11 +16,15 @@ block_info_t last_block = NULL;
 
 void *my_malloc(size_t size) 
 {
+  size = allign(size);
   block_info_t block = find_reusable_block(size);
   if(block) 
   {
-    // TO DO: Create new block from redundant memory
     block->is_free = 0;
+    if( block->size >= size + BLOCK_INFO_SIZE + 8 )
+    {
+      divide_block(block, size);
+    }
     return (void *)(block + 1);
   }
   block = request_new_block(size);
@@ -43,7 +48,7 @@ block_info_t find_reusable_block(size_t size)
 block_info_t request_new_block(size_t size)
 {
   block_info_t new_block = sbrk(0);
-  if( sbrk(allign(size) + BLOCK_INFO_SIZE) == (void *)-1 )
+  if( sbrk(size + BLOCK_INFO_SIZE) == (void *)-1 )
   {
     return NULL;
   }
@@ -68,7 +73,7 @@ block_info_t request_new_block(size_t size)
 
 void divide_block(block_info_t block, size_t size)
 {
-  if( !block )
+  if(!block)
   {
     return;
   }
@@ -141,4 +146,21 @@ size_t allign(size_t n)
   {
     return 0;
   }
+}
+
+void print_block_list()
+{
+  printf("## First block: %d\n", first_block);
+  block_info_t current = first_block;
+  while( current )
+  {
+    printf("## A: %d, S: %d, F: %d, N: %d, P: %d\n", 
+        current,
+        current->size, 
+        current->is_free, 
+        current->next, 
+        current->prev); 
+    current = current->next;
+  }
+  printf("## Last block: %d\n", last_block);
 }

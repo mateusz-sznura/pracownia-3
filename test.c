@@ -73,15 +73,45 @@ void test_case_5()
   printf("Address: %d (int)\n", ptr_2);
 }
 
+void test_6()
+{
+  printf("-------- Test 6\n");
+  printf("-------- Demonstrate block splitting (+ exhausting allocated space)\n");
+  
+  int *array = (int *)my_malloc(20 * sizeof(int));
+  int *after = (int *)my_malloc(sizeof(int));
+  *after = 100;
+  for(int i = 0; i < 20; ++i)
+  {
+    array[i] = i;
+  }
+  printf("Address: %d, value: %d (array[0])\n", array, array[0]);
+  printf("Address: %d, value: %d (after)\n", after, *after);
+
+  printf("Exhausting allocated space does not overwrite next block? %d\n", ((block_info_t)after - 1)->size == sizeof(size_t));  
+
+  my_free(array);
+
+  long *num_1 = (long *)my_malloc(sizeof(long));
+  long *num_2 = (long *)my_malloc(sizeof(long));
+  *num_1 = 500;
+  *num_2 = 600;
+  printf("Address: %d, value: %d (num_1)\n", num_1, *num_1);
+  printf("Address: %d, value: %d (num_2)\n", num_2, *num_2);
+
+  print_block_list();
+}
+
 int main(int argc, char** argv)
 {
   // int *p = malloc(0);
   // printf("%d, %d\n", p, *p);
-  print_sizes();
-  test_case_1();
-  test_case_2();
-  test_case_3();
-  test_case_4();
-  test_case_5();
+  // print_sizes();
+  // test_case_1();
+  // test_case_2();
+  // test_case_3();
+  // test_case_4();
+  // test_case_5();
+  test_6();
   return 0;
 }

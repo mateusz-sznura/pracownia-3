@@ -6,4 +6,6 @@ void *my_calloc(size_t count, size_t size);
 void *my_realloc(void *ptr, size_t size);
 void my_free(void *ptr);
 
+void print_block_list();
+
 #endif
